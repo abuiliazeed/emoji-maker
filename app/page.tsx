@@ -6,17 +6,22 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import EmojiGrid from '@/components/EmojiGrid'
 import { generateEmoji } from '@/lib/api'
+import { Emoji } from '@/types/emoji'
 
 export default function Home() {
   const [prompt, setPrompt] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedEmojis, setGeneratedEmojis] = useState<string[]>([])
+  const [generatedEmojis, setGeneratedEmojis] = useState<Emoji[]>([])
 
   const handleGenerate = async () => {
     setIsGenerating(true)
     try {
-      const emoji = await generateEmoji(prompt)
-      setGeneratedEmojis(prevEmojis => [...prevEmojis, emoji])
+      const imageUrl = await generateEmoji(prompt)
+      setGeneratedEmojis(prevEmojis => [...prevEmojis, { 
+        id: Date.now().toString(),
+        url: imageUrl, // Change 'emoji' to 'url'
+        prompt,
+      }])
     } catch (error) {
       console.error('Error generating emoji:', error)
     }

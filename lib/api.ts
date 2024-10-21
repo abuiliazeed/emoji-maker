@@ -18,5 +18,5 @@ export async function generateEmoji(prompt: string): Promise<string> {
   }
 
   const data = await response.json();
-  return data.imageUrl;
+  return data.imageUrl; // Make sure this matches the property name in your API response
 }

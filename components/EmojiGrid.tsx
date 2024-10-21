@@ -2,12 +2,14 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Download, Heart } from 'lucide-react'
+import { Emoji } from '@/types/emoji'
 
 interface EmojiGridProps {
-  emojis: string[]
+  emojis: Emoji[]
+  isGenerating: boolean
 }
 
-const EmojiGrid = ({ emojis }: EmojiGridProps) => {
+const EmojiGrid = ({ emojis, isGenerating }: EmojiGridProps) => {
   const handleDownload = async (imageUrl: string) => {
     try {
       console.log('Downloading image:', imageUrl);
@@ -37,27 +39,37 @@ const EmojiGrid = ({ emojis }: EmojiGridProps) => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {emojis.map((emojiUrl, index) => (
-        <Card key={index} className="relative group">
+      {isGenerating && (
+        <Card className="relative group">
+          <CardContent className="p-2">
+            <div className="relative aspect-square flex items-center justify-center bg-gray-100 animate-pulse">
+              <span className="text-gray-500">Generating...</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      {emojis.map((emoji) => (
+        <Card key={emoji.id} className="relative group">
           <CardContent className="p-2">
             <div className="relative aspect-square">
               <Image
-                src={emojiUrl}
-                alt={`Emoji ${index + 1}`}
+                src={emoji.url}
+                alt={emoji.prompt}
                 fill
                 sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                 className="rounded-md object-cover"
               />
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50">
                 <Button
-                  size="icon"
                   variant="ghost"
-                  onClick={() => handleDownload(emojiUrl)}
+                  size="icon"
+                  onClick={() => handleDownload(emoji.url)}
+                  className="mr-2"
                 >
-                  <Download className="h-4 w-4" />
+                  <Download className="h-6 w-6 text-white" />
                 </Button>
-                <Button size="icon" variant="ghost">
-                  <Heart className="h-4 w-4" />
+                <Button variant="ghost" size="icon">
+                  <Heart className="h-6 w-6 text-white" />
                 </Button>
               </div>
             </div>
