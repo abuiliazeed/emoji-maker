@@ -2,25 +2,34 @@ import Image from 'next/image'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Download, Heart } from 'lucide-react'
-import { Emoji } from '@/types/emoji'  // Adjust the import path as needed
 
 interface EmojiGridProps {
-  emojis: Emoji[]
+  emojis: string[]
 }
 
 const EmojiGrid = ({ emojis }: EmojiGridProps) => {
-  const handleDownload = async (imageUrl: string, prompt: string) => {
+  const handleDownload = async (imageUrl: string) => {
     try {
-      const response = await fetch(imageUrl);
+      console.log('Downloading image:', imageUrl);
+      const response = await fetch(`/api/download-image?url=${encodeURIComponent(imageUrl)}`);
+      console.log('Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+      }
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `emoji-${prompt.replace(/\s+/g, '-')}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'emoji.png';
+      document.body.appendChild(a);
+      a.click();
       window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading image:', error);
     }
@@ -28,22 +37,22 @@ const EmojiGrid = ({ emojis }: EmojiGridProps) => {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {emojis.map((emoji) => (
-        <Card key={emoji.id} className="relative group">
+      {emojis.map((emojiUrl, index) => (
+        <Card key={index} className="relative group">
           <CardContent className="p-2">
             <div className="relative aspect-square">
               <Image
-                src={emoji.url}
-                alt={emoji.prompt}
-                layout="fill"
-                objectFit="cover"
-                className="rounded-md"
+                src={emojiUrl}
+                alt={`Emoji ${index + 1}`}
+                fill
+                sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                className="rounded-md object-cover"
               />
               <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-2">
                 <Button
                   size="icon"
                   variant="ghost"
-                  onClick={() => handleDownload(emoji.url, emoji.prompt)}
+                  onClick={() => handleDownload(emojiUrl)}
                 >
                   <Download className="h-4 w-4" />
                 </Button>
