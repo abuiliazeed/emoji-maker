@@ -60,7 +60,7 @@ The updated prompt is visible in the revised_prompt field of the data response o
 Example DALL·E 3 generations
 Prompt	Generation
 A photograph of a white Siamese cat.	
-Each image can be returned as either a URL or Base64 data, using the response_format parameter. URLs will expire after an hour.
+Each image can be returned as either a URL or Base64 data, using the response_format parameter. URLs will expire after an hour..
 
 
 # Current file structure
